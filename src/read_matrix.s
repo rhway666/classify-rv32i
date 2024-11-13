@@ -35,7 +35,7 @@
 #   Caller is responsible for freeing returned matrix pointer
 # ==============================================================================
 read_matrix:
-    
+
     # Prologue
     addi sp, sp, -40
     sw ra, 0(sp)
@@ -76,6 +76,16 @@ read_matrix:
 
     # mul s1, t1, t2   # s1 is number of elements
     # FIXME: Replace 'mul' with your own implementation
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements:
+    bge t5, t1, end_count
+    add t4, t4, t2
+    addi t5, t5, 1
+    j count_total_elements
+
+end_count:
+    mv s1, t4
 
     slli t3, s1, 2
     sw t3, 24(sp)    # size in bytes

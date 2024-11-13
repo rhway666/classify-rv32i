@@ -139,7 +139,7 @@ classify:
     
     lw a1, 4(sp) # restores the argument pointer
     
-    lw a0, 12(a1) # set argument 1 for the read_matrix function  
+    lw a0, 12(a1) # set argument 1 for the read_matrix function
     mv a1, s7 # set argument 2 for the read_matrix function
     mv a2, s8 # set argument 3 for the read_matrix function
     
@@ -163,16 +163,33 @@ classify:
     sw a4, 16(sp)
     sw a5, 20(sp)
     sw a6, 24(sp)
-    
+
     lw t0, 0(s3)
     lw t1, 0(s8)
+
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements0:
+    bge t5, t0, end_count0
+    add t4, t4, t1
+    addi t5, t5, 1
+    j count_total_elements0
+
+end_count0:
+    mv a0, t4
+
+
+
+
+
     slli a0, a0, 2
-    jal malloc 
+    jal malloc
     beq a0, x0, error_malloc
     mv s9, a0 # move h to s9
     
-    mv a6, a0 # h 
+    mv a6, a0 # h
     
     mv a0, s0 # move m0 array to first arg
     lw a1, 0(s3) # move m0 rows to second arg
@@ -206,6 +223,22 @@ classify:
     # mul a1, t0, t1 # length of h array and set it as second argument
     # FIXME: Replace 'mul' with your own implementation
     
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements1:
+    bge t5, t0, end_count1
+    add t4, t4, t1
+    addi t5, t5, 1
+    j count_total_elements1
+
+end_count1:
+    mv a1, t4
+
+
+
+
+
+
     jal relu
     
     lw a0, 0(sp)
@@ -227,8 +260,20 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s6)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements2:
+    bge t5, t0, end_count2
+    add t4, t4, t1
+    addi t5, t5, 1
+    j count_total_elements2
+
+end_count2:
+    mv a0, t4
+
+
     slli a0, a0, 2
-    jal malloc 
+    jal malloc
     beq a0, x0, error_malloc
     mv s10, a0 # move o to s10
     
@@ -286,9 +331,34 @@ classify:
     mv a0, s10 # load o array into first arg
     lw t0, 0(s3)
     lw t1, 0(s6)
-    mul a1, t0, t1 # load length of array into second arg
+
     # FIXME: Replace 'mul' with your own implementation
-    
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements3:
+    bge t5, t0, end_count3
+    add t4, t4, t1
+    addi t5, t5, 1
+    j count_total_elements3
+
+end_count3:
+    mv a1, t4
+
+
+
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements4:
+    bge t5, t0, end_count4
+    add t4, t4, t1
+    addi t5, t5, 1
+    j count_total_elements4
+
+end_count4:
+    mv a1, t4
+
+
+
     jal argmax
     
     mv t0, a0 # move return value of argmax into t0
@@ -361,7 +431,7 @@ epilouge:
     lw s1, 8(sp) # m1 matrix
     lw s2, 12(sp) # input matrix
     
-    lw s3, 16(sp) 
+    lw s3, 16(sp)
     lw s4, 20(sp)
     
     lw s5, 24(sp)

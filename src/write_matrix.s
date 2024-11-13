@@ -63,6 +63,19 @@ write_matrix:
 
     # mul s4, s2, s3   # s4 = total elements
     # FIXME: Replace 'mul' with your own implementation
+    li t4, 0    # total
+    li t5, 0    # iter
+count_total_elements5:
+    bge t5, s2, end_count5
+    add t4, t4, s3
+    addi t5, t5, 1
+    j count_total_elements5
+
+end_count5:
+    mv s4, t4
+
+
+
 
     # write matrix data to file
     mv a0, s0

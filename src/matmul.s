@@ -35,7 +35,7 @@
 # =======================================================
 matmul:
     # Error checks
-    li t0 1
+    li t0, 1
     blt a1, t0, error
     blt a2, t0, error
     blt a4, t0, error
@@ -45,28 +45,28 @@ matmul:
     # Prologue
     addi sp, sp, -28
     sw ra, 0(sp)
-    
+
     sw s0, 4(sp)
     sw s1, 8(sp)
     sw s2, 12(sp)
     sw s3, 16(sp)
     sw s4, 20(sp)
     sw s5, 24(sp)
-    
+
     li s0, 0 # outer loop counter
     li s1, 0 # inner loop counter
     mv s2, a6 # incrementing result matrix pointer
     mv s3, a0 # incrementing matrix A pointer, increments durring outer loop
-    mv s4, a3 # incrementing matrix B pointer, increments during inner loop 
-    
+    mv s4, a3 # incrementing matrix B pointer, increments during inner loop
+
 outer_loop_start:
     #s0 is going to be the loop counter for the rows in A
-    li s1, 0
+    li s1, 0        # col iter
     mv s4, a3
     blt s0, a1, inner_loop_start
 
     j outer_loop_end
-    
+
 inner_loop_start:
 # HELPER FUNCTION: Dot product of 2 int arrays
 # Arguments:
@@ -86,17 +86,17 @@ inner_loop_start:
     sw a3, 12(sp)
     sw a4, 16(sp)
     sw a5, 20(sp)
-    
+
     mv a0, s3 # setting pointer for matrix A into the correct argument value
     mv a1, s4 # setting pointer for Matrix B into the correct argument value
     mv a2, a2 # setting the number of elements to use to the columns of A
     li a3, 1 # stride for matrix A
     mv a4, a5 # stride for matrix B
-    
+
     jal dot
-    
+
     mv t0, a0 # storing result of the dot product into t0
-    
+
     lw a0, 0(sp)
     lw a1, 4(sp)
     lw a2, 8(sp)
@@ -104,19 +104,57 @@ inner_loop_start:
     lw a4, 16(sp)
     lw a5, 20(sp)
     addi sp, sp, 24
-    
-    sw t0, 0(s2)
+
+    sw t0, 0(s2)    # output iter result t0 store to output martix
     addi s2, s2, 4 # Incrememtning pointer for result matrix
-    
+
     li t1, 4
     add s4, s4, t1 # incrememtning the column on Matrix B
-    
+
     addi s1, s1, 1
     j inner_loop_start
-    
+
 inner_loop_end:
     # TODO: Add your own implementation
+    # s0, 0  outer loop counter
+    # s1, 0  inner loop counter
+    # s2, a6  incrementing result matrix pointer
+    # s3, a0  incrementing matrix A pointer, increments durring outer loop
+    # s4, a3  incrementing matrix B pointer, increments during inner loop
+#    Arguments:
+#   First Matrix (M0):
+#     a0: Memory address of first element
+#     a1: Row count
+#     a2: Column count
+#
+#   Second Matrix (M1):
+#     a3: Memory address of first element
+#     a4: Row count
+#     a5: Column count
+#
+#   Output Matrix (D):
+#     a6: Memory address for result storage
+    addi s0, s0, 1      #  Move to the next row in result matrix
+     #  Move matirxA mem to the next row
+    slli t2, a2, 2
+    add s3, s3, t2
+
+    j outer_loop_start
+
+outer_loop_end:
+    # Epilogue: Restore registers and return
+    lw ra, 0(sp)
+    lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw s2, 12(sp)
+    lw s3, 16(sp)
+    lw s4, 20(sp)
+    lw s5, 24(sp)
+    addi sp, sp, 28
+    jr ra
 
 error:
     li a0, 38
     j exit
+
+
